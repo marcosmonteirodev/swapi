@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="29a09608-7919-4b1b-991d-e7308d2765f9" >
+		<http:request-connection protocol="HTTPS" host="api.example.com" port="443"/>
+	</http:request-config>
+	<flow
+		name="planets-swapi"
+		doc:id="1cbfe387-9fc8-49b8-b40f-d0a5c43e5c04">
+		<http:request
+			method="GET"
+			doc:name="Request Planets"
+			doc:id="d1bea4db-ba41-4433-9aa7-ecdce7322afb"
+			config-ref="RequestSwapi"
+			path="${swapi.planetsPath}" />
+		<ee:transform
+			doc:name="Transform Inglês"
+			doc:id="da6ff664-9a76-4869-8a58-addb221ffe25">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/planetSwapi.dwl" />
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="Get Transform Inglês" doc:id="cbcb0136-426b-4feb-b197-f7c8a843ebe0" variableName="transformIngles" />
+		<ee:transform doc:name="Transform Português" doc:id="7438c7dc-baf3-4daa-8982-73d81bb91a9b" >
+			<ee:message >
+				<ee:set-payload resource="dw/dw.swapi/planetsSwapiPortugues.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="planetsId-swapi" doc:id="c0444c92-4b47-429c-88ae-13e978b25c94" >
+		<ee:transform doc:name="Planet Id" doc:id="152991e8-1747-4a4f-851c-997c21e2c10f" >
+			<ee:variables >
+				<ee:set-variable resource="planetsSwapiId.dwl" variableName="planetsId" />
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request Planets" doc:id="0251044c-423f-4059-a437-9ad19c432fe4" config-ref="RequestSwapi" path="${swapi.planetsPathId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	planetsId : attributes.uriParams.planetsId
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Inglês" doc:id="07fb313f-86e2-4ad0-bc86-3cb503478a6b" >
+			<ee:message >
+				<ee:set-payload resource="dw/dw.swapi/planetIdSwapi.dwl" />
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="Get Transform Inglês" doc:id="adae8ea4-617e-433b-954b-1c5d387cdbc7" variableName="transformIngles" />
+		<ee:transform doc:name="Transform Português" doc:id="348a8ba1-65c9-413f-8666-a6edb57e3691" >
+			<ee:message >
+				<ee:set-payload resource="dw/dw.swapi/planetIdSwapiPortugues.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

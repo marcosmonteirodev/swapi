@@ -1,0 +1,7 @@
+%dw 2.0
+
+type auto_1ce31084_f3b6_4a89_a86c_25034b2be7d5_Output_Payload = {|
+  count: Any, 
+  results: Any
+|}
+

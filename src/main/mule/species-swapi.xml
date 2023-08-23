@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow
+		name="species-swapi"
+		doc:id="0198325e-be6b-431f-8335-efd0b43a965d">
+		<http:request
+			method="GET"
+			doc:name="Request Species"
+			doc:id="e6c4f488-5358-4911-92ac-03a9a7f1164c"
+			config-ref="RequestSwapi"
+			path="${swapi.speciesPath}" />
+		<ee:transform
+			doc:name="Transform Inglês"
+			doc:id="ff38ecb1-e746-4226-9d27-a4270265b283">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/specieSwapi.dwl" />
+			</ee:message>
+		</ee:transform>
+		<set-variable
+			value="#[payload]"
+			doc:name="Get Transform Inglês"
+			doc:id="6497293b-f8a5-479a-b95a-77d040bd3d47"
+			variableName="transformIngles" />
+		<ee:transform
+			doc:name="Transform Português"
+			doc:id="26c439a1-9715-45f4-b6e7-2159542e3c22">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/specieSwapiPortugues.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow
+		name="species-swapiId"
+		doc:id="f22bce11-1633-4620-896e-3cf1670a5bd0">
+		<ee:transform
+			doc:name="Species Id"
+			doc:id="9286a0b7-3e19-4fa1-9821-c71eee70bfcf">
+			<ee:variables>
+				<ee:set-variable variableName="speciesId"><![CDATA[attributes.uriParams.'speciesId']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request
+			method="GET"
+			doc:name="Request Species Id"
+			doc:id="ef8c94fc-c85c-4dc0-bec0-933b5d9ba03d"
+			config-ref="RequestSwapi"
+			path="${swapi.speciesPathId}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	speciesId : attributes.uriParams.speciesId
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform
+			doc:name="Transform Inglês"
+			doc:id="50f19c3f-54f2-4681-ac3d-f8366561ad72">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/specieSwapiId.dwl" />
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="Get Transform Inglês" doc:id="98666ceb-a26c-4307-b3e0-8f61a339bb3f" variableName="transformIngles" />
+		<ee:transform doc:name="Transform Português" doc:id="a7c90b6e-3363-44fa-b05d-c71e90057656" >
+			<ee:message >
+				<ee:set-payload resource="dw/dw.swapi/specieSwapiIdPortugues.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

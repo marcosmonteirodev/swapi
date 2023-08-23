@@ -1,0 +1,7 @@
+%dw 2.0
+
+type auto_1cbfe387_9fc8_49b8_b40f_d0a5c43e5c04_Output_Variables_transformIngles = {|
+  count: Any, 
+  results: Any
+|}
+

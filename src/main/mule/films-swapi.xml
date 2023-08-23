@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow
+		name="films-swapi"
+		doc:id="1ce31084-f3b6-4a89-a86c-25034b2be7d5">
+		<http:request
+			method="GET"
+			doc:name="Request Films"
+			doc:id="212b84b0-54e0-4922-8a30-cd76b10be70c"
+			config-ref="RequestSwapi"
+			path="${swapi.filmPath}" />
+		<ee:transform
+			doc:name="Transform Inglês"
+			doc:id="0b56e595-4036-4232-8454-2976f2f843e2">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/filmsSwapi.dwl" />
+			</ee:message>
+			<ee:variables />
+		</ee:transform>
+		<set-variable
+			value="#[payload]"
+			doc:name="GET Transform Inglês"
+			doc:id="e694ae2f-babe-4d08-b09a-bea305119f0a"
+			variableName="transformIngles" />
+		<ee:transform
+			doc:name="Transform Português"
+			doc:id="fe08c255-2075-4dc2-98d4-3c0370f69f63">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/filmsSwapiPortugues.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow
+		name="filmsId-swapi"
+		doc:id="2188e5be-490c-43ad-ad68-6071e981f803">
+		<ee:transform
+			doc:name="FilmsId"
+			doc:id="e52cce47-91bb-45cb-b6ee-554f0fd1735b">
+			<ee:variables>
+				<ee:set-variable variableName="filmsId"><![CDATA[attributes.uriParams.'filmsId']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request
+			method="GET"
+			doc:name="Request Films Id"
+			doc:id="27bca8e1-50f4-4760-8574-b8572b96055e"
+			config-ref="RequestSwapi"
+			path="${swapi.filmPathId}">
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	filmsId : attributes.uriParams.filmsId
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform
+			doc:name="Transform Inglês"
+			doc:id="7fe18b67-6e85-4e50-8366-976b8def8fca">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/filmsSwapiId.dwl"/>
+			</ee:message>
+			<ee:variables />
+		</ee:transform>
+		<set-variable
+			value="#[payload]"
+			doc:name="GET Transform Inglês"
+			doc:id="238c8cb5-f1d0-4b0e-9ecb-a990d3caddb1"
+			variableName="transformIngles" />
+		<ee:transform
+			doc:name="Transform Português"
+			doc:id="b9fe5095-eee4-4718-9a06-82e041b78dfa">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/filmsSwapiIdPortugues.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

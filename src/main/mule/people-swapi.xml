@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow
+		name="people-swapi"
+		doc:id="5aa52acd-77b8-4143-a15c-6d810f5d7649">
+		<http:request
+			method="GET"
+			doc:name="Request Peaople"
+			doc:id="0bc612c7-495c-49b4-9372-c9d3bee2f4a1"
+			config-ref="RequestSwapi"
+			path="${swapi.peoplePath}" />
+		<ee:transform
+			doc:name="Transform Inglês"
+			doc:id="3b85d139-393b-424d-80d7-fd3374efd4d8">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/peopleSwapi.dwl" />
+			</ee:message>
+		</ee:transform>
+		<set-variable
+			value="#[payload]"
+			doc:name="Get Transform Inglês"
+			doc:id="84efa2ad-a3be-4ea1-9837-e6b520567d0b"
+			variableName="transformIngles" />
+		<ee:transform
+			doc:name="Transform Português"
+			doc:id="5d86db62-7008-47c3-a803-379e8bec1d88">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/peopleSwapiPortugues.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow
+		name="peopleId-swapi"
+		doc:id="e4f9ef9f-d5b4-46ba-8db6-21a242f0a135">
+		<ee:transform
+			doc:name="People Id"
+			doc:id="8da5693e-fee0-4d0d-b112-517ffb0710a8">
+			<ee:variables>
+				<ee:set-variable variableName="peopleId"><![CDATA[attributes.uriParams.'peopleId']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request
+			method="GET"
+			doc:name="Request People Id"
+			doc:id="aabb7797-c878-4457-b8fd-c2e94dcaec4c"
+			config-ref="RequestSwapi"
+			path="${swapi.peoplePathId}">
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	peopleId : attributes.uriParams.peopleId
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform
+			doc:name="Transform Inglês"
+			doc:id="b1b4de7d-8f2d-4e89-bfc3-25180d73428c">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/peopleSwapiId.dwl" />
+			</ee:message>
+		</ee:transform>
+		<set-variable
+			value="#[payload]"
+			doc:name="Get Transform Inglês"
+			doc:id="44138ae9-ad74-452d-b2f6-1b4834fa3322"
+			variableName="transformIngles" />
+		<ee:transform
+			doc:name="Transform Português"
+			doc:id="2d901c58-43cf-4915-9a6e-609dda99ed01">
+			<ee:message>
+				<ee:set-payload resource="dw/dw.swapi/peopleSwapiIdPortugues.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

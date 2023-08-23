@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+	<http:listener-config name="swapi-httpListenerConfig">
+		<http:listener-connection
+			host="0.0.0.0"
+			port="8091" />
+	</http:listener-config>
+	<apikit:config
+		name="swapi-config"
+		api="resource::6fc70aa7-cead-4633-9738-12478fd132f8:swapi:1.0.1:raml:zip:swapi.raml"
+		outboundHeadersMapName="outboundHeaders"
+		httpStatusVarName="httpStatus" />
+	<flow name="swapi-main">
+		<http:listener
+			config-ref="swapi-httpListenerConfig"
+			path="/*">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+				<http:body><![CDATA[#[payload]]]></http:body>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:router config-ref="swapi-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:BAD_REQUEST">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">400</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">404</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">405</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">406</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">415</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">501</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="swapi-console">
+		<http:listener
+			config-ref="swapi-httpListenerConfig"
+			path="/console/*">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+				<http:body>#[payload]</http:body>
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:console config-ref="swapi-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">404</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="get:\films:swapi-config">
+		<flow-ref
+			doc:name="Reference Films Swapi"
+			doc:id="7d09e6ed-c2be-464f-809c-664ce231fbf3"
+			name="films-swapi" />
+	</flow>
+	<flow name="get:\films\(filmsId):swapi-config">
+		<flow-ref
+			doc:name="Reference Films Swapi Id"
+			doc:id="5d15b151-f3e4-4d2e-9e7b-3a795c31f232"
+			name="filmsId-swapi" />
+	</flow>
+	<flow name="get:\people:swapi-config">
+		<flow-ref
+			doc:name="Reference People"
+			doc:id="fc77dad7-ebc8-4c76-ab5e-63d2e52b3921"
+			name="people-swapi" />
+	</flow>
+	<flow name="get:\people\(peopleId):swapi-config">
+		<flow-ref
+			doc:name="Reference People Id"
+			doc:id="d0b8eb1a-db84-4efd-b005-dc92dcb79ed3"
+			name="peopleId-swapi" />
+	</flow>
+	<flow name="get:\planets:swapi-config">
+		<flow-ref
+			doc:name="Reference Planets"
+			doc:id="8a65b18e-7141-4a6f-a327-fb355b477c7b"
+			name="planets-swapi" />
+	</flow>
+	<flow name="get:\planets\(planetsId):swapi-config">
+		<flow-ref
+			doc:name="Reference Planets Id"
+			doc:id="cc398f1f-5148-458f-a120-60a49702fb24"
+			name="planetsId-swapi" />
+	</flow>
+	<flow name="get:\species:swapi-config">
+		<flow-ref
+			doc:name="Reference Specie"
+			doc:id="38c5b6ea-9f45-4dec-976c-ae2f675cc982"
+			name="species-swapi" />
+	</flow>
+	<flow name="get:\species\(speciesId):swapi-config">
+		<flow-ref
+			doc:name="Reference Species Id"
+			doc:id="07e49f81-9570-4445-af17-0c352727755f"
+			name="species-swapiId" />
+	</flow>
+</mule>

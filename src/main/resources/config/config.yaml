@@ -1,0 +1,13 @@
+swapi:
+  protocol: "HTTPS"
+  host: "swapi.dev"
+  port: "443"
+  timeout: "30000"
+  filmPathId: "api/films/{filmsId}"
+  filmPath: "api/films"
+  peoplePathId: "api/people/{peopleId}"
+  peoplePath: "api/people"
+  speciesPath: "api/species"
+  speciesPathId: "api/species/{speciesId}"
+  planetsPath: "api/planets"
+  planetsPathId: "api/planets/{planetsId}"

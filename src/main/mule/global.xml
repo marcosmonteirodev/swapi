@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="RequestSwapi" doc:name="HTTP Request configuration" doc:id="e0d2ca0b-01e5-4b7e-8d79-4e0c8e804b39" >
+		<http:request-connection host="${swapi.host}" port="${swapi.port}" connectionIdleTimeout="${swapi.timeout}" protocol="HTTPS"/>
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="0a5474cc-a2a8-4f39-9c14-58d546186896" file="config\config.yaml" />
+</mule>

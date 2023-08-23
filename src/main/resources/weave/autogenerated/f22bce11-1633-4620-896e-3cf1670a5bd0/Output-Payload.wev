@@ -1,0 +1,17 @@
+%dw 2.0
+
+type auto_f22bce11_1633_4620_896e_3cf1670a5bd0_Output_Payload = {|
+  name: Any, 
+  "Classificação": Any, 
+  "Designação": Any, 
+  "Altura Média": Any, 
+  "Cores da Pele": Any, 
+  "Cores do Cabelo": Any, 
+  "Cores dos Olhos": Any, 
+  "Duração Média de Vida": Any, 
+  "Língua": Any, 
+  Criado: Any, 
+  Editado: Any, 
+  "Endereço WEB": Any
+|}
+

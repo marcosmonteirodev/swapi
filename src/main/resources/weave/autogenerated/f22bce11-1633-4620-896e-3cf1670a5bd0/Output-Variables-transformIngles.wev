@@ -1,0 +1,17 @@
+%dw 2.0
+
+type auto_f22bce11_1633_4620_896e_3cf1670a5bd0_Output_Variables_transformIngles = {|
+  name: Any, 
+  classification: Any, 
+  designation: Any, 
+  average_height: Any, 
+  skin_colors: Any, 
+  hair_colors: Any, 
+  eye_colors: Any, 
+  average_lifespan: Any, 
+  language: Any, 
+  created: Any, 
+  edited: Any, 
+  url: Any
+|}
+

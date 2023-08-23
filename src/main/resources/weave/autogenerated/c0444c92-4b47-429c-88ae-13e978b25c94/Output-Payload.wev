@@ -1,0 +1,17 @@
+%dw 2.0
+
+type auto_c0444c92_4b47_429c_88ae_13e978b25c94_Output_Payload = {|
+  Nome: Any, 
+  "Período de Rotação": Any, 
+  "Período Orbital": Any, 
+  "Diâmetro": Any, 
+  Clima: Any, 
+  Gravidade: Any, 
+  Terreno: Any, 
+  "Águas Superficiais": Any, 
+  "População": Any, 
+  Criado: Any, 
+  Editado: Any, 
+  "Endereço WEB": Any
+|}
+
